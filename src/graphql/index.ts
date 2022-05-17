@@ -1,3 +1,4 @@
+export * from './SchoolStaff'
 export * from './Question'
 export * from './ExamAnswer'
 export * from './ExamQuestion'

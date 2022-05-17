@@ -168,6 +168,27 @@ export const User = objectType({
         return root.notifications
       },
     })
+    t.list.field('schoolStaffs', {
+      type: 'SchoolStaff',
+      args: {
+        where: 'SchoolStaffWhereInput',
+        orderBy: 'SchoolStaffOrderByWithRelationInput',
+        cursor: 'SchoolStaffWhereUniqueInput',
+        take: 'Int',
+        skip: 'Int',
+        distinct: 'SchoolStaffScalarFieldEnum',
+      },
+      resolve(root: any) {
+        return root.schoolStaffs
+      },
+    })
+    t.nullable.string('schoolId')
+    t.nullable.field('school', {
+      type: 'School',
+      resolve(root: any) {
+        return root.school
+      },
+    })
     t.field('_count', {
       type: 'UserCountOutputType',
       resolve(root: any) {

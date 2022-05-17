@@ -113,9 +113,10 @@ export const AuthMutation = extendType({
 
         nrg: stringArg(),
         nisn: stringArg(),
+        schoolId: stringArg(),
       },
       rateLimit: () => ({ max: 30, window: '5m' }),
-      resolve: async (_, { password, ...rest }, ctx) => {
+      resolve: async (_, { schoolId, password, ...rest }, ctx) => {
         try {
           const user = await ctx.prisma.user.create({
             data: {
@@ -123,6 +124,16 @@ export const AuthMutation = extendType({
               password: await ctx.provider.hash.hash(password),
             },
           })
+
+          if (rest.role == 'TEACHER') {
+            await ctx.prisma.schoolStaff.create({
+              data: {
+                userId: user.id,
+                schoolId,
+                roles: ['TEACHER'],
+              },
+            })
+          }
 
           delete user.password
 

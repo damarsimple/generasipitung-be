@@ -45,6 +45,34 @@ export const School = objectType({
         return root.regency
       },
     })
+    t.list.field('schoolStaffs', {
+      type: 'SchoolStaff',
+      args: {
+        where: 'SchoolStaffWhereInput',
+        orderBy: 'SchoolStaffOrderByWithRelationInput',
+        cursor: 'SchoolStaffWhereUniqueInput',
+        take: 'Int',
+        skip: 'Int',
+        distinct: 'SchoolStaffScalarFieldEnum',
+      },
+      resolve(root: any) {
+        return root.schoolStaffs
+      },
+    })
+    t.list.field('students', {
+      type: 'User',
+      args: {
+        where: 'UserWhereInput',
+        orderBy: 'UserOrderByWithRelationInput',
+        cursor: 'UserWhereUniqueInput',
+        take: 'Int',
+        skip: 'Int',
+        distinct: 'UserScalarFieldEnum',
+      },
+      resolve(root: any) {
+        return root.students
+      },
+    })
     t.field('_count', {
       type: 'SchoolCountOutputType',
       resolve(root: any) {

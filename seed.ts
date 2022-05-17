@@ -49,7 +49,7 @@ async function populateProvinces() {
       regencyMap.set(KEY, [])
     }
 
-    regencyMap.set(KEY, [...regencyMap.get(KEY), ...cityName])
+    regencyMap.set(KEY, [...regencyMap.get(KEY), cityName])
   }
 
   for (const province of lookupProvinceMap.values()) {
@@ -69,17 +69,16 @@ async function populateProvinces() {
 }
 
 async function main() {
+  if ((await prisma.province.count()) == 0) {
+    await populateProvinces()
+  } else {
+    console.log('provinces already populated')
+  }
+
+  const province = await prisma.province.findFirst({
+    select: { id: true, regencies: true },
+  })
   if ((await prisma.user.count()) == 0) {
-    if ((await prisma.province.count()) == 0) {
-      await populateProvinces()
-    } else {
-      console.log('provinces already populated')
-    }
-
-    const province = await prisma.province.findFirst({
-      select: { id: true, regencies: true },
-    })
-
     await prisma.user.create({
       data: {
         email: 'damaralbaribin@gmail.com',
@@ -96,6 +95,20 @@ async function main() {
     console.log(`user created`)
   } else {
     console.log(`user already created`)
+  }
+  if ((await prisma.school.count()) == 0) {
+    await prisma.school.create({
+      data: {
+        name: 'Sekolah Besar Xd Dhd',
+        provinceId: province.id,
+        regencyId: province.regencies[0].id,
+        levels: [1, 2, 3],
+        type: 'SMK',
+      },
+    })
+    console.log(`school created`)
+  } else {
+    console.log(`school already created`)
   }
 }
 
