@@ -139,13 +139,17 @@ export const AuthMutation = extendType({
 
           const token = await ctx.provider.token.create(user)
 
-          // await sendMail({
-          //   to: [user.email],
-          //   subject: 'Verifikasi Email',
-          //   html_body: `Klik link disini untuk memverifikasi email <strong>${
-          //     getConfig('CONFIRM_MAIL_CLAIM') + user.verifykey
-          //   }</strong>`,
-          // })
+          try {
+            await sendMail({
+              to: [user.email],
+              subject: 'Verifikasi Email',
+              html_body: `Klik link disini untuk memverifikasi email <strong>${
+                getConfig('CONFIRM_MAIL_CLAIM') + user.verifykey
+              }</strong>`,
+            })
+          } catch (error) {
+            console.log(`Error sending mail: ${error}`)
+          }
 
           return {
             success: true,
