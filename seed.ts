@@ -141,7 +141,11 @@ async function populateProvinces() {
       const provinceId: string = provincesMap[school.propinsi?.toUpperCase()]?.id
       const regencyId: string = regenciesMap[school.kabupaten_kota?.toUpperCase()]?.id
 
-      if (!provinceId || !regencyId) return;
+      if (!provinceId || !regencyId) {
+        console.log(`${school.sekolah} ${school.propinsi} ${school.kabupaten_kota}`)
+
+        continue;
+      };
 
       await prisma.school.create({
         data: {
