@@ -70,10 +70,12 @@ export interface Context {
 export async function createContext({ req }: ExpressContext): Promise<Context> {
   const user = await authParser(req)
 
+  if (user) {
+    console.log(`User ${user.name} logged in.`)
+  }
+
   const ip: Maybe<string> = (req.headers['x-forwarded-for'] ||
     req?.socket?.remoteAddress) as string
-
-  console.log(ip)
 
   return {
     user,

@@ -13,18 +13,6 @@ import { WebSocketServer } from 'ws'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import { createContext } from './src/context'
 
-async function getUser() {
-  const user = prisma.user.findUnique({
-    where: {
-      id: 'ca34ca93-961c-4941-bc8a-2171b0dcfcbf',
-    },
-  })
-
-  if (!user) return null
-
-  return new ExtendedUser(await user)
-}
-
 async function startApolloServer() {
   const app = express()
 
@@ -59,7 +47,8 @@ async function startApolloServer() {
           ...(await createContext({
             req: {
               headers: {
-                authorization: e.connectionParams.Authorization,
+                //@ts-ignore
+                authorization: e.connectionParams?.headers?.authorization,
               },
             },
           } as any)),
