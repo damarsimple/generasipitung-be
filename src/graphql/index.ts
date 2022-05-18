@@ -1,3 +1,4 @@
+export * from './PrivateChatSession'
 export * from './SchoolStaff'
 export * from './Question'
 export * from './ExamAnswer'
