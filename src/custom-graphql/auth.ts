@@ -153,7 +153,7 @@ export const AuthMutation = extendType({
 
           return {
             success: true,
-            message: 'User created',
+            message: 'User berhasil dibuat',
             user,
             token,
           }
@@ -181,7 +181,7 @@ export const AuthMutation = extendType({
         if (user) {
           return {
             success: false,
-            message: 'User exists',
+            message: `${email} sudah terdaftar`,
           }
         }
 
@@ -208,7 +208,7 @@ export const AuthMutation = extendType({
         if (!user) {
           return {
             success: false,
-            message: 'User not found',
+            message: 'Email tidak terdaftar',
           }
         }
 
@@ -217,7 +217,7 @@ export const AuthMutation = extendType({
         if (!isValid) {
           return {
             success: false,
-            message: 'Invalid password',
+            message: 'Password salah',
           }
         }
         delete user.password
