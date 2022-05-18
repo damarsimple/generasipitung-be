@@ -72,7 +72,14 @@ export const subscriptions = subscriptionType({
     t.field('privateChatSubscribe', {
       type: 'PrivateChat',
       authorize: (_, __, { can }) => can('LISTEN_CHAT'),
-      async subscribe(_, __, { user }) {
+      async subscribe(_, __, { user, ...rest }) {
+        if (!user) {
+          console.log(rest)
+          return
+        }
+
+        console.log('register request ' + user.id)
+
         return pubsub.asyncIterator<PrivateChat>([
           'PRIVATE_CHAT_CREATED_' + user.id,
         ])
