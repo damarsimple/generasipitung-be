@@ -24,6 +24,7 @@ export const PrivateChat = objectType({
     })
     t.field('contentType', { type: 'ContentType' })
     t.string('content')
+    t.nullable.field('readAt', { type: 'DateTime' })
     t.field('createdAt', { type: 'DateTime' })
     t.field('updatedAt', { type: 'DateTime' })
   },
