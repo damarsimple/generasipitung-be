@@ -21,24 +21,27 @@ export const PrivateChatMutation = extendType({
       },
 
       resolve: async (_, { to }, { prisma, user }) => {
-        console.log(to)
-        console.log(user.id)
-
         let session = await prisma.privateChatSession.findFirst({
           where: {
-            toId: to,
-            fromId: user.id,
+            AND: {
+              toId: user.id,
+              fromId: to,
+            },
           },
+          include: { to: true, from: true },
         })
+
+        console.log(`from: ${user.id} to: ${to}`)
 
         if (!session) {
           console.log('create triggered')
 
           session = await prisma.privateChatSession.create({
             data: {
-              toId: to,
-              fromId: user.id,
+              toId: user.id,
+              fromId: to,
             },
+            include: { to: true, from: true },
           })
         }
 
