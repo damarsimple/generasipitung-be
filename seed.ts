@@ -141,6 +141,8 @@ async function populateProvinces() {
 
     for (const school of schools) {
 
+      console.log(`${school.sekolah}`)
+
       const propinsi = school.propinsi?.replace("Prov. ", "")
 
 
