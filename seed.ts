@@ -157,6 +157,7 @@ async function populateProvinces() {
 
         provincesMap[province.name] = province;
 
+        provinceId = province.id
       };
 
       if (!regencyId) {
@@ -169,6 +170,8 @@ async function populateProvinces() {
         })
 
         regencyMap[regency.name] = regency;
+
+        regencyId = regency.id
 
 
       }
