@@ -116,6 +116,9 @@ async function populateProvinces() {
 
   }, {} as Record<string, Province>)
 
+
+
+
   const schoolsF = await fg(['./data/schools/**.json'], { dot: true });
 
   const typeLevelsMap: Record<string, number[]> = {
@@ -140,14 +143,35 @@ async function populateProvinces() {
 
       const propinsi = school.propinsi?.replace("Prov. ", "")
 
-      const provinceId: string = provincesMap[propinsi?.toUpperCase()]?.id
-      const regencyId: string = regenciesMap[school.kabupaten_kota?.toUpperCase()]?.id
 
-      if (!provinceId || !regencyId) {
-        console.log(`${school.sekolah} ${propinsi} ${school.kabupaten_kota}`)
+      let provinceId: string = provincesMap[propinsi?.toUpperCase()]?.id
+      let regencyId: string = regenciesMap[school.kabupaten_kota?.toUpperCase()]?.id
 
-        continue;
+      if (!provinceId) {
+
+        const province = await prisma.province.create({
+          data: {
+            name: propinsi?.toUpperCase()
+          }
+        })
+
+        provincesMap[province.name] = province;
+
       };
+
+      if (!regencyId) {
+
+        const regency = await prisma.regency.create({
+          data: {
+            provinceId: provinceId,
+            name: school.kabupaten_kota
+          }
+        })
+
+        regencyMap[regency.name] = regency;
+
+
+      }
 
       await prisma.school.create({
         data: {
@@ -165,12 +189,11 @@ async function populateProvinces() {
   }
 
 
+
+
 }
 
 async function main() {
-
-
-
 
 
 
