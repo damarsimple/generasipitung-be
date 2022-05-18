@@ -1,8 +1,32 @@
 import { prisma } from './modules/prisma'
 import axios from 'axios'
-import { provider } from './src/context'
+import { provider } from './src/context';
+import fg from 'fast-glob'
+import { readFileSync } from 'fs'
+import { Province } from '@prisma/client';
+
+
+export interface Sekolah {
+  kode_prop: string;
+  propinsi: string;
+  kode_kab_kota: string;
+  kabupaten_kota: string;
+  kode_kec: string;
+  kecamatan: string;
+  id: string;
+  npsn: string;
+  sekolah: string;
+  bentuk: string;
+  status: string;
+  alamat_jalan: string;
+  lintang: string;
+  bujur: string;
+}
 
 async function populateProvinces() {
+
+
+
   const PROVINCE_URL =
     'https://raw.githubusercontent.com/guzfirdaus/Wilayah-Administrasi-Indonesia/master/csv/provinces.csv'
   const REGENCY_URL =
@@ -66,9 +90,84 @@ async function populateProvinces() {
       },
     })
   }
+
+  console.log(`provinces populated`)
+
+  const provinces = await prisma.province.findMany({})
+
+  const provincesMap = provinces.reduce((acc, cur) => {
+
+    return {
+      ...acc,
+      [cur.name]: cur
+    }
+
+  }, {} as Record<string, Province>)
+
+  const regencies = await prisma.regency.findMany({})
+
+
+  const regenciesMap = regencies.reduce((acc, cur) => {
+
+    return {
+      ...acc,
+      [cur.name]: cur
+    }
+
+  }, {} as Record<string, Province>)
+
+  const schoolsF = await fg(['./data/schools/**.json'], { dot: true });
+
+  const typeLevelsMap: Record<string, number[]> = {
+    'SD': [1, 2, 3, 4, 5, 6],
+    'SDLB': [1, 2, 3, 4, 5, 6],
+
+    'SMP': [7, 8, 9],
+    'SMLB': [7, 8, 9],
+    'SMPLB': [7, 8, 9],
+
+    'SMK': [10, 11, 12],
+    'SMA': [10, 11, 12],
+    'SMALB': [10, 11, 12],
+
+  }
+
+  for (const schoolsJson of schoolsF) {
+
+    const schools = Object.values(JSON.parse(readFileSync(schoolsJson, 'utf8')))[0] as Sekolah[]
+
+    for (const school of schools) {
+
+      const provinceId: string = provincesMap[school.propinsi?.toUpperCase()]?.id
+      const regencyId: string = regenciesMap[school.kabupaten_kota?.toUpperCase()]?.id
+
+      if (!provinceId || !regencyId) return;
+
+      await prisma.school.create({
+        data: {
+
+          name: school.sekolah,
+          provinceId,
+          regencyId,
+          levels: typeLevelsMap[school.bentuk],
+          type: school.bentuk,
+          address: school.alamat_jalan,
+
+        }
+      })
+    }
+  }
+
+
 }
 
 async function main() {
+
+
+
+
+
+
   if ((await prisma.province.count()) == 0) {
     await populateProvinces()
   } else {
