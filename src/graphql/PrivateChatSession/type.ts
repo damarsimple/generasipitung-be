@@ -22,6 +22,14 @@ export const PrivateChatSession = objectType({
         return root.to
       },
     })
+    t.nullable.field('lastReadAt', { type: 'DateTime' })
+    t.nullable.string('lastChatId')
+    t.nullable.field('lastChat', {
+      type: 'PrivateChat',
+      resolve(root: any) {
+        return root.lastChat
+      },
+    })
     t.field('createdAt', { type: 'DateTime' })
     t.field('updatedAt', { type: 'DateTime' })
   },
