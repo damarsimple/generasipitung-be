@@ -71,7 +71,7 @@ export async function createContext({ req }: ExpressContext): Promise<Context> {
   const user = await authParser(req)
 
   const ip: Maybe<string> = (req.headers['x-forwarded-for'] ||
-    req.socket.remoteAddress) as string
+    req?.socket?.remoteAddress) as string
 
   console.log(ip)
 
