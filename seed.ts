@@ -138,11 +138,13 @@ async function populateProvinces() {
 
     for (const school of schools) {
 
-      const provinceId: string = provincesMap[school.propinsi?.toUpperCase()]?.id
+      const propinsi = school.propinsi?.replace("Prov. ", "")
+
+      const provinceId: string = provincesMap[propinsi?.toUpperCase()]?.id
       const regencyId: string = regenciesMap[school.kabupaten_kota?.toUpperCase()]?.id
 
       if (!provinceId || !regencyId) {
-        console.log(`${school.sekolah} ${school.propinsi} ${school.kabupaten_kota}`)
+        console.log(`${school.sekolah} ${propinsi} ${school.kabupaten_kota}`)
 
         continue;
       };
