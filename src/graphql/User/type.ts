@@ -98,32 +98,18 @@ export const User = objectType({
         return root.examsessions
       },
     })
-    t.list.field('privateChats', {
-      type: 'PrivateChat',
+    t.list.field('myChats', {
+      type: 'Chat',
       args: {
-        where: 'PrivateChatWhereInput',
-        orderBy: 'PrivateChatOrderByWithRelationInput',
-        cursor: 'PrivateChatWhereUniqueInput',
+        where: 'ChatWhereInput',
+        orderBy: 'ChatOrderByWithRelationInput',
+        cursor: 'ChatWhereUniqueInput',
         take: 'Int',
         skip: 'Int',
-        distinct: 'PrivateChatScalarFieldEnum',
+        distinct: 'ChatScalarFieldEnum',
       },
       resolve(root: any) {
-        return root.privateChats
-      },
-    })
-    t.list.field('myPrivateChats', {
-      type: 'PrivateChat',
-      args: {
-        where: 'PrivateChatWhereInput',
-        orderBy: 'PrivateChatOrderByWithRelationInput',
-        cursor: 'PrivateChatWhereUniqueInput',
-        take: 'Int',
-        skip: 'Int',
-        distinct: 'PrivateChatScalarFieldEnum',
-      },
-      resolve(root: any) {
-        return root.myPrivateChats
+        return root.myChats
       },
     })
     t.list.field('classrooms', {
@@ -187,34 +173,6 @@ export const User = objectType({
       type: 'School',
       resolve(root: any) {
         return root.school
-      },
-    })
-    t.list.field('privateChatSession', {
-      type: 'PrivateChatSession',
-      args: {
-        where: 'PrivateChatSessionWhereInput',
-        orderBy: 'PrivateChatSessionOrderByWithRelationInput',
-        cursor: 'PrivateChatSessionWhereUniqueInput',
-        take: 'Int',
-        skip: 'Int',
-        distinct: 'PrivateChatSessionScalarFieldEnum',
-      },
-      resolve(root: any) {
-        return root.privateChatSession
-      },
-    })
-    t.list.field('myPrivateChatSession', {
-      type: 'PrivateChatSession',
-      args: {
-        where: 'PrivateChatSessionWhereInput',
-        orderBy: 'PrivateChatSessionOrderByWithRelationInput',
-        cursor: 'PrivateChatSessionWhereUniqueInput',
-        take: 'Int',
-        skip: 'Int',
-        distinct: 'PrivateChatSessionScalarFieldEnum',
-      },
-      resolve(root: any) {
-        return root.myPrivateChatSession
       },
     })
     t.field('_count', {

@@ -1,4 +1,4 @@
-import { PrivateChat } from '@prisma/client'
+import { Chat, ChatSession } from '@prisma/client'
 import {
   arg,
   extendType,
@@ -10,47 +10,56 @@ import {
 import { storeFile } from '../../modules/filesystem'
 import { pubsub, publish } from '../../modules/pubsub'
 
-export const PrivateChatMutation = extendType({
+const comparator = (e: string[]) => {
+  return e.sort(function (a, b) {
+    return ('' + a).localeCompare(b);
+  })
+}
+
+export const createOrUpdate = async ({ to, prisma, user }): Promise<ChatSession> => {
+  let session = await prisma.chatSession.findFirst({
+    where: {
+      participantsIds: {
+        hasEvery: comparator([user.id, to]),
+      }
+    },
+  })
+
+  console.log(`from: ${user.id} to: ${to}`)
+
+  if (!session) {
+    console.log('create triggered')
+
+    session = await prisma.chatSession.create({
+      data: {
+        participantsIds: comparator([user.id, to]),
+
+      },
+    })
+  }
+
+  return session;
+}
+
+export const ChatMutation = extendType({
   type: 'Mutation',
   definition(t) {
     t.nullable.field('createNewSession', {
-      type: 'PrivateChatSession',
+      type: 'ChatSession',
       authorize: (_, __, { can }) => can('SEND_CHAT'),
       args: {
         to: nonNull(stringArg()),
       },
 
       resolve: async (_, { to }, { prisma, user }) => {
-        let session = await prisma.privateChatSession.findFirst({
-          where: {
-            AND: {
-              toId: user.id,
-              fromId: to,
-            },
-          },
-          include: { to: true, from: true },
-        })
 
-        console.log(`from: ${user.id} to: ${to}`)
 
-        if (!session) {
-          console.log('create triggered')
-
-          session = await prisma.privateChatSession.create({
-            data: {
-              toId: user.id,
-              fromId: to,
-            },
-            include: { to: true, from: true },
-          })
-        }
-
-        return session
+        return createOrUpdate({ to, prisma, user })
       },
     })
 
     t.nullable.field('sendChat', {
-      type: 'PrivateChat',
+      type: 'Chat',
       authorize: (_, __, { can }) => can('SEND_CHAT'),
       args: {
         to: nonNull(stringArg()),
@@ -65,44 +74,35 @@ export const PrivateChatMutation = extendType({
           contentU = await storeFile(file)
         }
 
-        const pc = await prisma.privateChat.create({
+        const target = await createOrUpdate({ to, prisma, user })
+
+        const pc = await prisma.chat.create({
           data: {
-            toId: to,
+            chatSessionId: target.id,
             fromId: user.id,
             content: contentU ?? content,
             contentType: type,
           },
         })
 
-        let session = await prisma.privateChatSession.findFirst({
-          where: {
-            toId: to,
-            fromId: user.id,
-          },
-        })
 
-        if (!session) {
-          session = await prisma.privateChatSession.create({
-            data: {
-              toId: to,
-              fromId: user.id,
-              lastChatId: pc.id,
-            },
-          })
-        }
 
-        await prisma.privateChatSession.update({
-          where: { id: session.id },
+        await prisma.chatSession.update({
+          where: { id: target.id },
           data: { updatedAt: new Date() },
         })
 
-        publish(
-          'PRIVATE_CHAT_CREATED_' + pc.toId,
-          await prisma.privateChat.findUnique({
-            where: { id: pc.id },
-            include: { from: true, to: true },
-          }),
-        )
+        for (const p of target.participantsIds) {
+          if (p !== user.id) {
+            publish(
+              'PRIVATE_CHAT_CREATED_' + p,
+              await prisma.chat.findUnique({
+                where: { id: pc.id },
+                include: { from: true },
+              }),
+            )
+          }
+        }
 
         return pc
       },
@@ -110,7 +110,7 @@ export const PrivateChatMutation = extendType({
   },
 })
 
-export const PrivateChatQuery = extendType({
+export const ChatQuery = extendType({
   type: 'Query',
   definition(t) {
     t.list.field('findChatTarget', {
@@ -138,11 +138,11 @@ export const PrivateChatQuery = extendType({
 
 export const subscriptions = subscriptionType({
   definition(t) {
-    t.field('privateChatSubscribe', {
-      type: 'PrivateChat',
+    t.field('chatSubscribe', {
+      type: 'Chat',
       authorize: (_, __, { can }) => can('LISTEN_CHAT'),
       async subscribe(_, __, { user, ...rest }) {
-        return pubsub.asyncIterator<PrivateChat>([
+        return pubsub.asyncIterator<Chat>([
           'PRIVATE_CHAT_CREATED_' + user.id,
         ])
       },

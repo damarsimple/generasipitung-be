@@ -113,8 +113,7 @@ model User {
   questions         Question[]
   examinations      Exam[]
   examsessions      ExamSession[]
-  privateChats      PrivateChat[]
-  myPrivateChats    PrivateChat[]      @relation("myPrivateChats")
+  myChats           Chat[]             @relation("myChats")
   classrooms        Classroom[]
   classroomStudents ClassroomStudent[]
   notifications     Notification[]
@@ -123,8 +122,6 @@ model User {
   schoolId String?
   school   School? @relation(fields: [schoolId], references: [id])
 
-  privateChatSession   PrivateChatSession[]
-  myPrivateChatSession PrivateChatSession[] @relation("myPrivateChatSession")
 }
 
 model Notification {
@@ -233,43 +230,36 @@ model ClassroomStudent {
   updatedAt DateTime @updatedAt
 }
 
-model PrivateChatSession {
+model ChatSession {
 
   id String @id @default(uuid())
 
-  fromId String
-  from   User   @relation("myPrivateChatSession", fields: [fromId], references: [id])
-
-  toId String
-  to   User   @relation(fields: [toId], references: [id])
+  participantsIds String[]
 
   lastReadAt DateTime?
 
-  lastChatId String?
-  lastChat   PrivateChat? @relation(fields: [lastChatId], references: [id])
-
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+
+  chats Chat[]
 }
 
-model PrivateChat {
+model Chat {
   id String @id @default(uuid())
 
   fromId String
-  from   User   @relation("myPrivateChats", fields: [fromId], references: [id])
-
-  toId String
-  to   User   @relation(fields: [toId], references: [id])
+  from   User   @relation("myChats", fields: [fromId], references: [id])
 
   contentType ContentType
   content     String
 
   readAt DateTime?
 
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  privateChatSession PrivateChatSession[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  chatSessionId String      @unique
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
 }
 
 model Exam {
