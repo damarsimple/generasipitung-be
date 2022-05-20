@@ -142,6 +142,18 @@ async function main() {
         regencyId: province.regencies[0].id,
       },
     })
+    await prisma.user.create({
+      data: {
+        email: 'damaralbaribin2@gmail.com',
+        password: await provider.hash.hash('123456789'),
+        name: 'Damar Albaribin Syamsu 2',
+        role: 'TEACHER',
+        isAdmin: true,
+        phoneNumber: '08123456789',
+        provinceId: province.id,
+        regencyId: province.regencies[0].id,
+      },
+    })
 
     console.log(`user created`)
   } else {

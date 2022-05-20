@@ -13,7 +13,8 @@
         "generate:prisma": "prisma generate",
         "generate:nexus": "ts-node --transpile-only src/nexusSchema",
         "db-dev": "prisma migrate dev",
-        "dev": "ts-node-dev --no-notify --respawn --transpile-only server"
+        "dev": "ts-node-dev --no-notify --respawn --transpile-only server",
+        "seed": "yarn prisma migrate reset --force && yarn ts-node-dev seed.ts"
     },
     "dependencies": {
         "@graphql-tools/schema": "^8.3.11",
@@ -39,6 +40,7 @@
         "graphql-ws": "^5.8.2",
         "ioredis": "^5.0.4",
         "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.21",
         "nexus": "1.3.0",
         "uWebSockets.js": "uNetworking/uWebSockets.js#v20.10.0",
         "uuidjs": "^4.2.11",
