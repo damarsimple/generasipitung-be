@@ -141,9 +141,17 @@ export const AuthMutation = extendType({
 
           try {
             await sendMail({
-              to: [user.email],
+              to: [
+                {
+                  name: user.name,
+                  address: user.email,
+                },
+              ],
               subject: 'Verifikasi Email',
-              html_body: `Klik link disini untuk memverifikasi email <strong>${
+              html: `Klik link disini untuk memverifikasi email <strong>${
+                getConfig('CONFIRM_MAIL_CLAIM') + user.verifykey
+              }</strong>`,
+              text: `Klik link disini untuk memverifikasi email <strong>${
                 getConfig('CONFIRM_MAIL_CLAIM') + user.verifykey
               }</strong>`,
             })

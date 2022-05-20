@@ -3,9 +3,14 @@ import { getConfig } from './modules/config'
 
 async function main() {
   await sendMail({
-    to: ['damaralbaribin@gmail.com'],
+    to: [
+      { name: 'Damar Albaribin Syamsu', address: 'damaralbaribin@gmail.com' },
+    ],
     subject: 'Verifikasi Email',
-    html_body: `Klik link disini untuk memverifikasi email <strong>${
+    html: `Klik link disini untuk memverifikasi email <strong>${
+      getConfig('CONFIRM_MAIL_CLAIM') + 123123
+    }</strong>`,
+    text: `Klik link disini untuk memverifikasi email <strong>${
       getConfig('CONFIRM_MAIL_CLAIM') + 123123
     }</strong>`,
   })
