@@ -110,6 +110,7 @@ export const AuthMutation = extendType({
       args: {
         type: nonNull(arg({ type: 'VerifyType' })),
       },
+      rateLimit: () => ({ max: 5, window: '5m' }),
       resolve: async (_, { key, type }, { prisma, user }) => {
         const where = { id: user.id }
 
