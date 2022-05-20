@@ -96,6 +96,11 @@ export const AuthMutation = extendType({
           default:
             break
         }
+
+        return {
+          status: true,
+          message: 'Kode Verifikasi valid',
+        }
       },
     })
 
