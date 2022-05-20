@@ -23,9 +23,5 @@ interface MailBody {
 }
 
 export const sendMail = async (data: MailBody) => {
-  return await mailClient.post(SEND_MAIL_ROUTE, {
-    sender: 'noreply@postal.damaral.my.id',
-    from: 'noreply@postal.damaral.my.id',
-    ...data,
-  })
+  return await mailClient.post(SEND_MAIL_ROUTE, data)
 }
