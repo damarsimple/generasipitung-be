@@ -32,7 +32,7 @@ export const AuthQuery = extendType({
 export const VerificationResponse = objectType({
   name: 'VerificationResponse',
   definition(t) {
-    t.boolean('success')
+    t.boolean('status')
     t.nullable.string('message')
   },
 })
