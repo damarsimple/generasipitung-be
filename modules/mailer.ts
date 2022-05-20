@@ -8,8 +8,6 @@ const mailClient = axios.create({
   },
 })
 
-const SEND_MAIL_ROUTE = '/users/6287d4c86ac05148aab59c52/submit'
-
 interface Target {
   name: string
   address: string
@@ -22,6 +20,15 @@ interface MailBody {
   to: Target[]
 }
 
-export const sendMail = async (data: MailBody) => {
+type SENDER_TYPE = string | 'VERIFICATOR' | 'ADMIN' | 'DAMAR'
+
+export const sendMail = async (data: MailBody, type: SENDER_TYPE = 'DAMAR') => {
+  const ID_RECORD = {
+    VERIFICATOR: '6287ea14b6b0f5e0d9d2a539',
+    DAMAR: '6287d4c86ac05148aab59c52',
+  }
+
+  const SEND_MAIL_ROUTE = `/users/${ID_RECORD[type]}/submit`
+
   return await mailClient.post(SEND_MAIL_ROUTE, data)
 }
