@@ -2,6 +2,7 @@ import { VerifyType } from '@prisma/client'
 import { getConfig } from '../../modules/config'
 import { objectType, extendType, nonNull, stringArg, arg } from 'nexus'
 import { sendMail } from '../../modules/mailer'
+import UUID from 'uuidjs'
 
 export const Auth = objectType({
   name: 'Auth',
@@ -100,6 +101,61 @@ export const AuthMutation = extendType({
         return {
           status: true,
           message: 'Kode Verifikasi valid',
+        }
+      },
+    })
+    t.field('resendVerification', {
+      type: VerificationResponse,
+      authorize: (_, __, { can }) => can('SEND_CHAT'),
+      args: {
+        type: nonNull(arg({ type: 'VerifyType' })),
+      },
+      resolve: async (_, { key, type }, { prisma, user }) => {
+        const where = { id: user.id }
+
+        const userA = await prisma.user.update({
+          where,
+          data: {
+            verifyType: type,
+            verifykey: UUID.generate(),
+          },
+        })
+
+        if (!userA) {
+          return {
+            status: false,
+            message: 'user tidak valid',
+          }
+        }
+        try {
+          await sendMail(
+            {
+              to: [
+                {
+                  name: userA.name,
+                  address: userA.email,
+                },
+              ],
+              subject: 'Verifikasi Email',
+              html: `Klik link disini untuk memverifikasi email <strong>${
+                getConfig('CONFIRM_MAIL_CLAIM') + userA.verifykey
+              }</strong>`,
+              text: `Klik link disini untuk memverifikasi email <strong>${
+                getConfig('CONFIRM_MAIL_CLAIM') + userA.verifykey
+              }</strong>`,
+            },
+            'VERIFICATOR',
+          )
+        } catch (error) {
+          return {
+            status: false,
+            message: 'gagal kirim ulang verifikasi',
+          }
+        }
+
+        return {
+          status: true,
+          message: 'berhasil kirim ulang verifikasi',
         }
       },
     })
